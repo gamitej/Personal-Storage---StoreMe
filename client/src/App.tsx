@@ -1,10 +1,11 @@
-function App() {
+import AppRoutes from '@/routes/route';
 
+function App() {
   return (
-    <div className="text-red-300">
-      hi bye
+    <div>
+      <AppRoutes />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
