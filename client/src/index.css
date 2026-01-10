@@ -145,7 +145,7 @@ body {
   }
 
   body {
-    @apply bg-white text-dark-200 min-h-screen;
+    @apply bg-white min-h-screen;
   }
 
   /* Remove scrollbar */
@@ -203,9 +203,6 @@ body {
   .body-2 {
     @apply text-[14px] leading-[20px] font-normal;
   }
-  .button {
-    @apply text-[14px] leading-[20px] font-medium;
-  }
   .caption {
     @apply text-[12px] leading-[16px] font-normal;
   }
@@ -216,9 +213,6 @@ body {
   /* ===== HELPER CLASSES */
   .container {
     @apply mx-auto max-w-7xl px-5;
-  }
-  .primary-btn {
-    @apply bg-brand hover:bg-brand-100 transition-all rounded-full button !important;
   }
   .flex-center {
     @apply flex items-center justify-center;

@@ -2,7 +2,9 @@ import { lazy, Suspense } from 'react';
 import ProtectedRoute from './ProtectedRoute';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
+const Signup = lazy(() => import('@/pages/Auth/Signup'));
 const LandingPage = lazy(() => import('@/pages/Landing'));
+const LoginPage = lazy(() => import('@/pages/Auth/Login'));
 
 const router = createBrowserRouter([
   // Protected Routes
@@ -23,11 +25,11 @@ const router = createBrowserRouter([
   // Public Routes
   {
     path: '/login',
-    element: <div>Login Page</div>,
+    element: <LoginPage />,
   },
   {
     path: '/signup',
-    element: <div>Signup Page</div>,
+    element: <Signup />,
   },
   {
     path: '*',
