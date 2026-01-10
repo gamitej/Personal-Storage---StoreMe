@@ -3,8 +3,16 @@ import ProtectedRoute from './ProtectedRoute';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const Signup = lazy(() => import('@/pages/Auth/Signup'));
-const LandingPage = lazy(() => import('@/pages/Landing'));
+const MyDrive = lazy(() => import('@/pages/MyDrive'));
 const LoginPage = lazy(() => import('@/pages/Auth/Login'));
+
+const Layouts = lazy(() => import('@/pages/Layouts'));
+
+const CommonPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <Layouts />
+  </Suspense>
+);
 
 const router = createBrowserRouter([
   // Protected Routes
@@ -15,9 +23,29 @@ const router = createBrowserRouter([
         index: true,
         element: (
           <Suspense fallback={<div>Loading...</div>}>
-            <LandingPage />
+            <MyDrive />
           </Suspense>
         ),
+      },
+      {
+        path: 'Recent',
+        element: <CommonPage />,
+      },
+      {
+        path: 'Photos',
+        element: <CommonPage />,
+      },
+      {
+        path: 'shared-with-me',
+        element: <CommonPage />,
+      },
+      {
+        path: 'starred',
+        element: <CommonPage />,
+      },
+      {
+        path: 'trash',
+        element: <CommonPage />,
       },
     ],
   },
