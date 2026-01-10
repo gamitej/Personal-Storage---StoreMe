@@ -1,15 +1,16 @@
 import { ZodError } from 'zod';
 import http from '@/services/https';
-import { Link } from 'react-router-dom';
 import { signupSchema } from './auth.schema';
 import { ChangeEvent, FormEvent } from 'react';
 import Authentication, { InputLabel } from '.';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getLoginState, setLogin, setSignup } from '@/redux/global/globalSlice';
+import { getSignupState, setAuth, setSignup } from '@/redux/global/globalSlice';
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const signupState = useSelector(getLoginState);
+  const navigate = useNavigate();
+  const signupState = useSelector(getSignupState);
 
   /**
    * ============================ EVENT HANDLERS ============================
@@ -26,38 +27,42 @@ const Signup = () => {
         password: signupState.password,
       });
 
-      dispatch(setLogin({ loading: true, error: null }));
-      const { data } = await http.post('/auth/signup', validatedData);
-      console.log(data);
+      dispatch(setSignup({ loading: true, error: null }));
+      // Make API call to signup
+      const { data, status } = await http.post('/auth/signup', validatedData);
+      if (data.success && status === 200) {
+        navigate('/login');
+        dispatch(setAuth(true));
+      } else {
+        dispatch(
+          setSignup({
+            error: data.message || 'Signup failed',
+          }),
+        );
+      }
     } catch (err) {
       if (err instanceof ZodError) {
         dispatch(
-          setLogin({
+          setSignup({
             error: err.issues[0].message,
           }),
         );
       } else {
         dispatch(
-          setLogin({
+          setSignup({
             error: 'Something went wrong',
           }),
         );
       }
     } finally {
-      dispatch(setLogin({ loading: false }));
+      dispatch(setSignup({ loading: false }));
     }
   };
 
   // Handle input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value, type } = e.target;
-    if (type === 'text') {
-      dispatch(setSignup({ email: value }));
-    } else if (type === 'password') {
-      dispatch(setSignup({ password: value }));
-    } else if (type === 'name') {
-      dispatch(setSignup({ name: value }));
-    }
+    const { value, id } = e.target;
+    dispatch(setSignup({ [id]: value }));
   };
 
   /**
@@ -66,7 +71,7 @@ const Signup = () => {
   return (
     <Authentication>
       <form onSubmit={handleSubmit} className="w-145 flex flex-col gap-6">
-        <h1 className="h1 text-(--dark-gray)">Signup</h1>
+        <h1 className="h1 text-(--dark-gray)">Create Account</h1>
         <InputLabel
           id="name"
           type="text"
@@ -98,9 +103,9 @@ const Signup = () => {
         <button
           type="submit"
           disabled={signupState.loading}
-          className="bg-(--pink) rounded-full py-2 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-(--pink) rounded-full py-2 text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          Signup
+          Create Account
         </button>
         <p className="font-normal text-(--dark-gray) text-sm text-center">
           Already have an account?{' '}

@@ -1,16 +1,22 @@
 import { ZodError } from 'zod';
 import http from '@/services/https';
-import { Link } from 'react-router-dom';
 import { loginSchema } from './auth.schema';
 import { ChangeEvent, FormEvent } from 'react';
 import Authentication, { InputLabel } from '.';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getLoginState, setLogin } from '@/redux/global/globalSlice';
+import { getLoginState, setAuth, setLogin } from '@/redux/global/globalSlice';
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const loginState = useSelector(getLoginState);
 
+  /**
+   * ============================ EVENT HANDLERS ============================
+   */
+
+  // Handle form submission
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -21,8 +27,18 @@ const Login = () => {
       });
 
       dispatch(setLogin({ loading: true, error: null }));
-      const { data } = await http.post('/auth/login', validatedData);
-      console.log(data);
+      // Make API call to login
+      const { data, status } = await http.post('/auth/login', validatedData);
+      if (data.success && status === 200) {
+        navigate('/');
+        dispatch(setAuth(true));
+      } else {
+        dispatch(
+          setLogin({
+            error: data.message || 'Login failed',
+          }),
+        );
+      }
     } catch (err) {
       if (err instanceof ZodError) {
         dispatch(
@@ -42,13 +58,10 @@ const Login = () => {
     }
   };
 
+  // Handle input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value, type } = e.target;
-    if (type === 'text') {
-      dispatch(setLogin({ email: value }));
-    } else if (type === 'password') {
-      dispatch(setLogin({ password: value }));
-    }
+    const { value, id } = e.target;
+    dispatch(setLogin({ [id]: value }));
   };
 
   /**
@@ -89,7 +102,7 @@ const Login = () => {
         <p className="font-normal text-(--dark-gray) text-sm text-center">
           Don't have an account?{' '}
           <Link to="/signup" className="text-(--pink) font-medium">
-            Signup
+            Create Account
           </Link>
         </p>
       </form>

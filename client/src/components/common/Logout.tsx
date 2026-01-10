@@ -1,9 +1,18 @@
+import { setAuth } from '@/redux/global/globalSlice';
+import { useDispatch } from 'react-redux';
+
 const Logout = () => {
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(setAuth(false));
+  };
+
   /**
    * TSX
    */
   return (
-    <button onClick={() => {}}>
+    <button onClick={handleLogout} className="cursor-pointer">
       <svg
         width="24"
         height="24"

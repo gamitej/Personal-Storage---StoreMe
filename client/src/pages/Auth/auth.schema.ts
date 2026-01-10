@@ -13,7 +13,7 @@ export const loginSchema = z.object({
 });
 
 export const signupSchema = loginSchema.extend({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(4, 'Name is required'),
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;

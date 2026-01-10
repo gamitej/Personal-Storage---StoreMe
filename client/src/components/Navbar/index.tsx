@@ -1,3 +1,4 @@
+import Logout from '../common/Logout';
 import Upload from '../common/Upload';
 
 const Navbar = () => {
@@ -10,7 +11,7 @@ const Navbar = () => {
       <input placeholder="search files..." />
       <div className="flex gap-4 items-center justify-center">
         <Upload />
-        <div>logout</div>
+        <Logout />
       </div>
     </div>
   );

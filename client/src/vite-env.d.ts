@@ -10,3 +10,5 @@ declare module '*.jpeg';
 declare module '*.svg';
 declare module '*.webp';
 declare module 'axios';
+declare module 'redux-persist';
+declare module 'redux-persist/lib/storage';

@@ -25,7 +25,7 @@ export const LoginUser = async (req, res) => {
 
     console.log("Login attempt:", email);
 
-    return res.status(200).json({ message: "Login successful" });
+    return res.status(200).json({ message: "Login successful", success: true });
   } catch (error) {
     return res.status(400).json({
       error: "Invalid request data",
@@ -44,7 +44,9 @@ export const SignupUser = async (req, res) => {
 
     console.log("Signup attempt:", email);
 
-    return res.status(200).json({ message: "Signup successful" });
+    return res
+      .status(200)
+      .json({ message: "Signup successful", success: true });
   } catch (error) {
     return res.status(400).json({
       error: "Invalid request data",
