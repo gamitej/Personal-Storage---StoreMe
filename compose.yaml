@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   frontend:
     build:
@@ -6,10 +8,12 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./client:/app          # Syncs local code to container
-      - /app/node_modules       # Anonymous volume: keeps container's node_modules separate
+      - ./client:/app
+      - /app/node_modules
     environment:
       - VITE_WATCH=true
+    depends_on:
+      - backend
 
   backend:
     build:
@@ -20,3 +24,26 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=store_me
+      - DB_USER=storeme
+      - DB_PASSWORD=storemepass
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    container_name: postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: store_me
+      POSTGRES_USER: storeme
+      POSTGRES_PASSWORD: storemepass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

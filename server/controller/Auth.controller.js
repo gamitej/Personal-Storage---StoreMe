@@ -1,59 +1,118 @@
-import { z, ZodError } from "zod";
+const bcrypt = require("bcrypt");
+const { z, ZodError } = require("zod");
+const { User } = require("../models/User.model");
+const { signToken } = require("../utils/JWT");
 
-export const loginSchema = z.object({
+/* ===================== Zod Schemas ===================== */
+
+const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
-
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
-      "Password must include uppercase, lowercase, number and special character"
-    ),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-export const signupSchema = loginSchema.extend({
+const signupSchema = loginSchema.extend({
   name: z.string().min(1, "Name is required"),
 });
 
-// =============================== Controller Functions ===============================
+/* ===================== LOGIN ===================== */
 
-export const LoginUser = async (req, res) => {
+const LoginUser = async (req, res) => {
   try {
-    const parsedData = loginSchema.parse(req.body);
-    const { email, password } = parsedData;
+    const { email, password } = loginSchema.parse(req.body);
 
-    console.log("Login attempt:", email);
+    const user = await User.findOne({ where: { email } });
 
-    return res.status(200).json({ message: "Login successful", success: true });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    const token = signToken({
+      user_id: user.user_id,
+      email: user.email,
+    });
+
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user,
+    });
   } catch (error) {
     return res.status(400).json({
-      error: "Invalid request data",
+      success: false,
       message:
         error instanceof ZodError
           ? error.issues[0].message
-          : "Something Went Wrong!",
+          : "Something went wrong",
     });
   }
 };
 
-export const SignupUser = async (req, res) => {
+/* ===================== SIGNUP ===================== */
+
+const SignupUser = async (req, res) => {
   try {
-    const parsedData = signupSchema.parse(req.body);
-    const { email, password, name } = parsedData;
+    const { email, password, name } = signupSchema.parse(req.body);
 
-    console.log("Signup attempt:", email);
+    const existingUser = await User.findOne({ where: { email } });
 
-    return res
-      .status(200)
-      .json({ message: "Signup successful", success: true });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already registered",
+      });
+    }
+
+    const user = await User.create({
+      email,
+      password,
+      name,
+    });
+
+    const token = signToken({
+      user_id: user.user_id,
+      email: user.email,
+    });
+
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Signup successful",
+      user,
+    });
   } catch (error) {
     return res.status(400).json({
-      error: "Invalid request data",
+      success: false,
       message:
         error instanceof ZodError
           ? error.issues[0].message
-          : "Something Went Wrong!",
+          : "Something went wrong",
     });
   }
 };
+
+module.exports = { LoginUser, SignupUser };

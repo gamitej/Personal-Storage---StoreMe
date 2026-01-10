@@ -2,7 +2,9 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const express = require("express");
-const { router: AuthRouter } = require("./routes/Auth.route");
+const cookieParser = require("cookie-parser");
+const AuthRouter = require("./routes/Auth.route");
+const { syncDatabase } = require("./models/Connection");
 
 dotenv.config();
 const app = express();
@@ -20,6 +22,7 @@ app.use(
 
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cookieParser());
 app.use(
   express.urlencoded({
     extended: true,
@@ -44,6 +47,8 @@ app.use((err, _req, res, _next) => {
     message: err.message,
   });
 });
+
+syncDatabase();
 
 // Start Server
 app.listen(PORT, () => {
