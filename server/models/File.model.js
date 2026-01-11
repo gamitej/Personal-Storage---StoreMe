@@ -1,5 +1,3 @@
-// models/File.js
-const User = require("./User.js");
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("./Connection");
 
@@ -15,50 +13,27 @@ const File = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: User,
+        model: "users", // Table name as string
         key: "user_id",
       },
     },
     parent_id: {
       type: DataTypes.UUID,
-      allowNull: true, // null for root directory
+      allowNull: true,
       references: {
-        model: "files",
+        model: "files", // Table name as string
         key: "id",
       },
     },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    type: {
-      type: DataTypes.ENUM("file", "folder"),
-      allowNull: false,
-    },
-    mime_type: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    size: {
-      type: DataTypes.BIGINT,
-      defaultValue: 0,
-    },
-    storage_path: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    checksum: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    is_deleted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
+    // ... name, type, etc. (keep your existing fields)
+    name: { type: DataTypes.STRING, allowNull: false },
+    type: { type: DataTypes.ENUM("file", "folder"), allowNull: false },
+    mime_type: { type: DataTypes.STRING, allowNull: true },
+    size: { type: DataTypes.BIGINT, defaultValue: 0 },
+    storage_path: { type: DataTypes.STRING, allowNull: true },
+    checksum: { type: DataTypes.STRING, allowNull: true },
+    is_deleted: { type: DataTypes.BOOLEAN, defaultValue: false },
+    deleted_at: { type: DataTypes.DATE, allowNull: true },
   },
   {
     sequelize,
@@ -73,9 +48,11 @@ const File = sequelize.define(
   }
 );
 
-// Associations
-File.belongsTo(User, { foreignKey: "user_id" });
-File.hasMany(File, { as: "children", foreignKey: "parent_id" });
-File.belongsTo(File, { as: "parent", foreignKey: "parent_id" });
+// We define associations inside a function to be called after ALL models are loaded
+File.associate = (models) => {
+  File.belongsTo(models.User, { foreignKey: "user_id" });
+  File.hasMany(models.File, { as: "children", foreignKey: "parent_id" });
+  File.belongsTo(models.File, { as: "parent", foreignKey: "parent_id" });
+};
 
 module.exports = { File };

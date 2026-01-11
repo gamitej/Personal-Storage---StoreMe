@@ -7,7 +7,7 @@ import globalSlice from './global/globalSlice';
 const globalPersistConfig = {
   key: 'global',
   storage,
-  whitelist: ['isAuthenticated'],
+  whitelist: ['userInfo'],
 };
 
 const persistedGlobalReducer = persistReducer(globalPersistConfig, globalSlice);

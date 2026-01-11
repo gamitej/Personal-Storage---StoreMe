@@ -8,7 +8,11 @@ const authFormInitialState: AuthFormState = {
 };
 
 const initialState: GlobalState = {
-  isAuthenticated: false,
+  userInfo: {
+    userName: null,
+    userId: null,
+    isAuthenticated: false,
+  },
   login: {
     ...authFormInitialState,
     email: null,
@@ -26,8 +30,16 @@ const globalSlice = createSlice({
   name: 'global',
   initialState,
   reducers: {
-    setAuth: (state, { payload }: { payload: boolean }) => {
-      state.isAuthenticated = payload;
+    setAuth: (
+      state,
+      { payload }: { payload: Partial<GlobalState['userInfo']> },
+    ) => {
+      const {
+        userId = null,
+        userName = null,
+        isAuthenticated = false,
+      } = payload;
+      state.userInfo = { userId, userName, isAuthenticated };
     },
     setLogin: (
       state,
@@ -47,10 +59,11 @@ const globalSlice = createSlice({
 // action creators
 export const { setAuth, setSignup, setLogin } = globalSlice.actions;
 export const getAuthState = (state: { global: GlobalState }) =>
-  state.global.isAuthenticated;
+  state.global.userInfo.isAuthenticated;
 export const getLoginState = (state: { global: GlobalState }) =>
   state.global.login;
 export const getSignupState = (state: { global: GlobalState }) =>
   state.global.signup;
-
+export const getUserInfo = (state: { global: GlobalState }) =>
+  state.global.userInfo;
 export default globalSlice.reducer;

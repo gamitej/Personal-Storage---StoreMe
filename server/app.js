@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const AuthRouter = require("./routes/Auth.route");
+const FileRouter = require("./routes/File.route");
 const { syncDatabase } = require("./models/Connection");
 
 dotenv.config();
@@ -38,6 +39,7 @@ app.get("/", (_req, res) => {
 
 // Routes
 app.use("/api/auth", AuthRouter);
+app.use("/api/files", FileRouter);
 
 // Global Error Handler
 app.use((err, _req, res, _next) => {

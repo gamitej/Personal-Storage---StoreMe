@@ -30,8 +30,15 @@ const Login = () => {
       // Make API call to login
       const { data, status } = await http.post('/auth/login', validatedData);
       if (data.success && status === 200) {
+        const { user } = data;
         navigate('/');
-        dispatch(setAuth(true));
+        dispatch(
+          setAuth({
+            isAuthenticated: true,
+            userName: user.name,
+            userId: user.user_id,
+          }),
+        );
       } else {
         dispatch(
           setLogin({

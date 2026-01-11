@@ -7,7 +7,11 @@ export interface AuthFormState {
 }
 
 export interface GlobalState {
-  isAuthenticated: boolean;
+  userInfo: {
+    userName: string | null;
+    userId: string | null;
+    isAuthenticated: boolean;
+  };
   login: AuthFormState;
   signup: AuthFormState;
 }

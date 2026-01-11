@@ -5,7 +5,7 @@ const Logout = () => {
   const dispatch = useDispatch();
 
   const handleLogout = () => {
-    dispatch(setAuth(false));
+    dispatch(setAuth({ isAuthenticated: false }));
   };
 
   /**
