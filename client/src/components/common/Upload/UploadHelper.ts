@@ -47,13 +47,12 @@ export const uploadFile = async ({
   userId: string;
   onProgress?: (percent: number) => void;
 }) => {
-  //   const totalUploadedChunks = 0;
   const fileId = `${Date.now()}-${file.name}`;
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
   const chunks = Array.from({ length: totalChunks }, (_, idx) => ({
     chunk: file.slice(idx * CHUNK_SIZE, (idx + 1) * CHUNK_SIZE),
-    chunkIndex: idx,
+    chunkIndex: idx + 1,
   }));
 
   for (let i = 0; i < totalChunks; i++) {

@@ -9,7 +9,7 @@ const SingleFileUpload = async (req, res) => {
       req.body;
 
     if (!req.file) {
-      return res.status(400).json({ message: "No file chunk received" });
+      return res.status(400).json({ message: "No file received" });
     }
 
     const chunkDir = path.join("temp/chunks", fileId);
@@ -18,8 +18,8 @@ const SingleFileUpload = async (req, res) => {
       fs.mkdirSync(chunkDir, { recursive: true });
     }
 
-    // Move chunk into temp folder
-    fs.renameSync(req.file.path, path.join(chunkDir, `${chunkIndex}`));
+    const chunkPath = path.join(chunkDir, String(chunkIndex));
+    fs.writeFileSync(chunkPath, req.file.buffer);
 
     const uploadedChunks = fs.readdirSync(chunkDir).length;
 
@@ -39,7 +39,7 @@ const SingleFileUpload = async (req, res) => {
     const buffers = [];
 
     for (let i = 0; i < totalChunks; i++) {
-      const chunkPath = path.join(chunkDir, `${i}`);
+      const chunkPath = path.join(chunkDir, `${i + 1}`);
       buffers.push(fs.readFileSync(chunkPath));
     }
 

@@ -1,15 +1,10 @@
 const multer = require("multer");
 
-// Multer setup for chunked uploads
-const tempChunkUpload = multer({
-  storage: multer.diskStorage({
-    destination: "temp/chunks",
-    filename: (req, _file, cb) => {
-      const { fileId, chunkIndex } = req.body;
-      const fileName = `${fileId}_${chunkIndex}`;
-      cb(null, fileName);
-    },
-  }),
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB per chunk
+  },
 });
 
-module.exports = { tempChunkUpload };
+module.exports = { upload };

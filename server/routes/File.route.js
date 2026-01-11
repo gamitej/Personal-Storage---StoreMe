@@ -10,11 +10,11 @@ const {
   RenameFolder,
   MoveFile,
 } = require("../controller/File.controller");
-const { tempChunkUpload } = require("../middleware/upload.middleware");
+const { upload } = require("../middleware/upload.middleware");
 
 const router = express.Router();
 
-router.post("/upload", tempChunkUpload.single("file"), SingleFileUpload); // Single file upload
+router.post("/upload", upload.single("file"), SingleFileUpload); // Single file upload
 router.post("/upload-multiple", MultiFileUpload); // Multiple file upload
 router.post("/upload-folder", FolderUpload); //  Folder upload
 router.post("/folders/create", CreateFolder); // Create new folder
