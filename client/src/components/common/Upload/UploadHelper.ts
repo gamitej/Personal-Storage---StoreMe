@@ -34,7 +34,7 @@ export const uploadChunk = async ({
     });
   } catch (error) {
     console.error(`Chunk ${chunkIndex} upload failed`, error);
-    throw error; // 🔥 IMPORTANT for retry logic
+    throw error;
   }
 };
 

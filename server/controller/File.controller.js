@@ -29,7 +29,7 @@ const SingleFileUpload = async (req, res) => {
         success: true,
         completed: false,
         chunkIndex,
-        message: `Chunk ${chunkIndex} uploaded`,
+        message: `Chunk ${chunkIndex} uploaded of file-id $ ${fileId}`,
       });
     }
 

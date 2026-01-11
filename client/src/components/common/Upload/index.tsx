@@ -1,12 +1,18 @@
+import UploadModal from './UploadModal';
 import { useSelector } from 'react-redux';
 import { uploadFile } from './UploadHelper';
-import { ChangeEvent, useRef, useState } from 'react';
 import { getUserInfo } from '@/redux/global/globalSlice';
+import { ChangeEvent, useReducer, useRef } from 'react';
+import { uploadInitialState, uploadStateReducer } from './Upload.state';
 
 const Upload = () => {
   const { userId } = useSelector(getUserInfo);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [progress, setProgress] = useState<number>(0);
+
+  const [uploadState, dispatch] = useReducer(
+    uploadStateReducer,
+    uploadInitialState,
+  );
 
   // For opening file dialog
   const handleClick = () => {
@@ -18,16 +24,17 @@ const Upload = () => {
     const files = Array.from(event.target.files || []);
 
     if (files && files.length > 0) {
+      dispatch({ type: 'SET_FILE', payload: files as any });
+      dispatch({ type: 'TOGGLE_TOAST', payload: true });
+
       await uploadFile({
         file: files[0],
-        onProgress: setProgress,
         userId: userId as string,
+        onProgress: (per) => dispatch({ type: 'SET_PROGRESS', payload: per }),
       });
     }
     return;
   };
-
-  console.log({ progress });
 
   /**
    * TSX
@@ -65,6 +72,13 @@ const Upload = () => {
         ref={fileRef}
         className="hidden"
         onChange={handleFileUpload}
+      />
+      <UploadModal
+        files={uploadState.files}
+        isToastOpen={uploadState.isToastOpen}
+        setIsToastOpen={() =>
+          dispatch({ type: 'TOGGLE_TOAST', payload: false })
+        }
       />
     </>
   );
