@@ -24,7 +24,7 @@ const Upload = () => {
     const files = Array.from(event.target.files || []);
 
     if (files && files.length > 0) {
-      dispatch({ type: 'SET_FILE', payload: files as any });
+      dispatch({ type: 'SET_FILE', payload: files as [] });
       dispatch({ type: 'TOGGLE_TOAST', payload: true });
 
       await uploadFile({
