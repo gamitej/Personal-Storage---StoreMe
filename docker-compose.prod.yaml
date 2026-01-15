@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  frontend:
+    image: amitej/storeme-frontend:1.0.0
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+  
+  backend:
+    image: amitej/storeme-backend:1.0.0
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=database
+      - DB_USER=root
+      - DB_PASSWORD=example
+      - DB_NAME=storeme
+    depends_on:
+      - database
+
+  database:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=storeme
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data: {}
