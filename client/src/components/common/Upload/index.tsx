@@ -20,21 +20,54 @@ const Upload = () => {
   };
 
   // For handling file upload
-  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
+ const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
 
-    if (files && files.length > 0) {
-      dispatch({ type: 'SET_FILE', payload: files as [] });
-      dispatch({ type: 'TOGGLE_TOAST', payload: true });
+  const uploadItems = files.map(file => ({
+    id: `${Date.now()}-${crypto.randomUUID()}`,
+    file,
+    progress: 0,
+    status: 'pending' as const,
+  }));
 
-      await uploadFile({
-        file: files[0],
-        userId: userId as string,
-        onProgress: (per) => dispatch({ type: 'SET_PROGRESS', payload: per }),
+  dispatch({ type: 'ADD_FILES', payload: uploadItems });
+  dispatch({ type: 'TOGGLE_TOAST', payload: true });
+
+  // Parallel upload
+  await Promise.all(
+    uploadItems.map(async item => {
+      dispatch({
+        type: 'SET_STATUS',
+        payload: { id: item.id, status: 'uploading' },
       });
-    }
-    return;
-  };
+
+      try {
+        await uploadFile({
+          file: item.file,
+          fileId: item.id,
+          userId: userId as string,
+          onProgress: (id, progress) =>
+            dispatch({
+              type: 'SET_PROGRESS',
+              payload: { id, progress },
+            }),
+        });
+
+        dispatch({
+          type: 'SET_STATUS',
+          payload: { id: item.id, status: 'completed' },
+        });
+      } catch {
+        dispatch({
+          type: 'SET_STATUS',
+          payload: { id: item.id, status: 'error' },
+        });
+      }
+    }),
+  );
+};
+
 
   /**
    * TSX

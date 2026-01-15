@@ -40,23 +40,20 @@ export const uploadChunk = async ({
 
 export const uploadFile = async ({
   file,
+  fileId,
   userId,
   onProgress,
 }: {
-  file: any;
+  file: File;
+  fileId: string;
   userId: string;
-  onProgress?: (percent: number) => void;
+  onProgress?: (fileId: string, value: number) => void;
 }) => {
-  const fileId = `${Date.now()}-${file.name}`;
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
-  const chunks = Array.from({ length: totalChunks }, (_, idx) => ({
-    chunk: file.slice(idx * CHUNK_SIZE, (idx + 1) * CHUNK_SIZE),
-    chunkIndex: idx + 1,
-  }));
-
   for (let i = 0; i < totalChunks; i++) {
-    const { chunk, chunkIndex } = chunks[i];
+    const chunkIndex = i + 1;
+    const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
 
     await uploadChunk({
       fileId,
@@ -67,7 +64,7 @@ export const uploadFile = async ({
       originalName: file.name,
     });
 
-    const totalPercentage = Math.round(((i + 1) / totalChunks) * 100);
-    onProgress?.(totalPercentage);
+    const percentage = Math.round(((i + 1) / totalChunks) * 100);
+    onProgress?.(fileId, percentage);
   }
 };
