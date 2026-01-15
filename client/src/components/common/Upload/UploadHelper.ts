@@ -9,6 +9,8 @@ type UploadChunkParams = {
   chunkIndex: number;
   totalChunks: number;
   originalName: string;
+  mimeType: string;
+  size: number;
 };
 
 export const uploadChunk = async ({
@@ -18,6 +20,8 @@ export const uploadChunk = async ({
   chunkIndex,
   totalChunks,
   originalName,
+  mimeType,
+  size,
 }: UploadChunkParams): Promise<void> => {
   const formData = new FormData();
 
@@ -26,7 +30,9 @@ export const uploadChunk = async ({
   formData.append('chunkIndex', String(chunkIndex));
   formData.append('totalChunks', String(totalChunks));
   formData.append('originalName', originalName);
-  formData.append('user_id', userId);
+  formData.append('userId', userId);
+  formData.append('mimeType', mimeType);
+  formData.append('size', String(size));
 
   try {
     await http.post('/files/upload', formData, {
@@ -62,6 +68,8 @@ export const uploadFile = async ({
       chunkIndex,
       totalChunks,
       originalName: file.name,
+      mimeType: file.type,
+      size: file.size,
     });
 
     const percentage = Math.round(((i + 1) / totalChunks) * 100);

@@ -5,8 +5,16 @@ const { uploadFile } = require("../services/storage");
 
 const SingleFileUpload = async (req, res) => {
   try {
-    const { user_id, fileId, chunkIndex, totalChunks, originalName, folderId } =
-      req.body;
+    const {
+      userId,
+      fileId,
+      chunkIndex,
+      totalChunks,
+      originalName,
+      folderId,
+      mimeType,
+      size,
+    } = req.body;
 
     if (!req.file) {
       return res.status(400).json({ message: "No file received" });
@@ -49,17 +57,19 @@ const SingleFileUpload = async (req, res) => {
     fs.rmSync(chunkDir, { recursive: true, force: true });
 
     const storedName = `${Date.now()}-${originalName}`;
-    const folderPath = `user-${user_id || "amitej"}/${folderId || "root"}`;
+    const folderPath = `user-${userId || "amitej"}/${folderId || "root"}`;
 
     const storagePath = await uploadFile(finalBuffer, storedName, folderPath);
 
     const file = await File.create({
       type: "file",
-      user_id: user_id,
+      user_id: userId,
       name: originalName,
       stored_name: storedName,
       storage_path: storagePath,
       parent_folder_id: folderId || null,
+      mime_type: mimeType,
+      size: size,
       storage_type: process.env.STORAGE_TYPE || "local",
     });
 
