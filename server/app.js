@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const AuthRouter = require("./routes/Auth.route");
 const FileRouter = require("./routes/File.route");
 const { syncDatabase } = require("./models/Connection");
+const { authMiddleware } = require("./middleware/auth.middleware");
 
 dotenv.config();
 const app = express();
@@ -39,7 +40,7 @@ app.get("/", (_req, res) => {
 
 // Routes
 app.use("/api/auth", AuthRouter);
-app.use("/api/files", FileRouter);
+app.use("/api/files", authMiddleware, FileRouter);
 
 // Global Error Handler
 app.use((err, _req, res, _next) => {

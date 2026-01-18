@@ -2,17 +2,9 @@ const bcrypt = require("bcrypt");
 const { z, ZodError } = require("zod");
 const { User } = require("../models/User.model");
 const { signToken } = require("../utils/JWT");
+const { loginSchema, signupSchema } = require("./zodSchema");
 
-/* ===================== Zod Schemas ===================== */
 
-const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
-
-const signupSchema = loginSchema.extend({
-  name: z.string().min(1, "Name is required"),
-});
 
 /* ===================== LOGIN ===================== */
 

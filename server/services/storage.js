@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require("fs").promises;
 const path = require("path");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
@@ -37,13 +37,11 @@ async function uploadFile(fileBuffer, filename, folder = "") {
   // LOCAL STORAGE
   const uploadPath = path.join(process.env.UPLOADS_PATH || "./uploads", folder);
 
-  if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
-  }
+  await fs.mkdir(uploadPath, { recursive: true });
 
   const filePath = path.join(uploadPath, filename);
-  fs.writeFileSync(filePath, fileBuffer);
-
+  await fs.writeFile(filePath, fileBuffer);
+  
   return filePath;
 }
 
