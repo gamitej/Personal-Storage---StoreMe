@@ -6,7 +6,6 @@ export const getUserFiles = async (folderId: string | null) => {
       withCredentials: true,
       params: { folderId },
     });
-    console.log('User Files:', data);
     return data;
   } catch (error) {
     console.error('Error fetching user files:', error);

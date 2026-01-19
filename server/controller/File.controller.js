@@ -118,13 +118,23 @@ const getUserFiles = async (req, res) => {
         user_id: userId,
         parent_id: folderId,
       },
+      order: [["updatedAt", "DESC"]],
     });
 
     if (!files) {
       return res.status(404).json({ message: "No files found" });
     }
 
-    return res.json({ files, message: "Files retrieved successfully" });
+    return res.json({
+      files: files.map((file) => ({
+        id: file.id,
+        name: file.name,
+        size: file.size,
+        parent_id: file.parent_id,
+        mime_type: file.mime_type,
+      })),
+      message: "Files retrieved successfully",
+    });
   } catch (error) {
     return res.status(500).json({
       message: "Something went wrong",

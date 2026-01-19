@@ -5,7 +5,6 @@ const { signToken } = require("../utils/JWT");
 const { loginSchema, signupSchema } = require("./zodSchema");
 
 
-
 /* ===================== LOGIN ===================== */
 
 const LoginUser = async (req, res) => {
